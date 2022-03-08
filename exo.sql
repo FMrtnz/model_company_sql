@@ -1,4 +1,5 @@
 USE toys_and_models;
+
 /*
 SELECT * FROM orders;
 SELECT * FROM products GROUP BY productLine LIMIT 3;
