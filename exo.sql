@@ -10,12 +10,13 @@ SELECT
     {fn MONTHNAME(o.orderDate)} as month,
 	YEAR(o.orderDate) as year,
     productLine,
+    #COUNT(ot.productCode) AS nb_products_sell,
     SUM(ot.quantityOrdered) as rate
 FROM products AS p
 JOIN orderdetails AS ot ON ot.productCode = p.productCode
 JOIN orders AS o ON ot.orderNumber = o.orderNumber
-GROUP BY YEAR(o.orderDate), MONTH(o.orderDate), productLine
-ORDER BY YEAR(o.orderDate), MONTH(o.orderDate), SUM(ot.quantityOrdered);
+GROUP BY YEAR(o.orderDate), MONTH(o.orderDate), YEAR(o.orderDate)
+ORDER BY productLine, MONTH(o.orderDate), YEAR(o.orderDate);
 
 /*
 FINANCES QUESTION
