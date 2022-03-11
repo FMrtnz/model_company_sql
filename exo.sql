@@ -77,21 +77,28 @@ LIMIT 5;
 HUMAN RESOURCES QUESTION
 Each month, the 2 sellers with the highest turnover.
 */
+# Create a first select to get performence of all sellers by year and then by month
 WITH t1 AS (SELECT
+	# Identify the year then the month for each seller performence
 	YEAR(payments.paymentDate) as year,
     MONTH(payments.paymentDate) as month,
+    # Get the seller from the payment through the customer
     customers.salesRepEmployeeNumber as seller_id,
     firstName as seller_first_name,
     lastName as seller_last_name,
+    # Get the amount earns by seller
     SUM(payments.amount) as amount,
+    # Set a rank to be able to select the best seller
     ROW_NUMBER() OVER(PARTITION BY year, month ORDER BY amount DESC) AS rank
 FROM payments
+# Get the seller from the payment through the customer
 LEFT JOIN customers
 ON payments.customerNumber = customers.customerNumber
 LEFT JOIN employees
 ON employeeNumber = salesRepEmployeeNumber
 GROUP BY employeeNumber, MONTH(paymentDate), YEAR(paymentDate)
 ORDER BY year, month, amount DESC)
+# Doing a second select to choose the 2 first sellers by year then month
 SELECT * FROM t1
 WHERE rank < 3
 ORDER BY year, month, rank;
