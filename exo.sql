@@ -10,7 +10,7 @@ SELECT
     {fn MONTHNAME(o.orderDate)} as month,
 	YEAR(o.orderDate) as year,
     productLine,
-    SUM(ot.quantityOrdered)
+    SUM(ot.quantityOrdered) as rate
 FROM products AS p
 JOIN orderdetails AS ot ON ot.productCode = p.productCode
 JOIN orders AS o ON ot.orderNumber = o.orderNumber
@@ -77,17 +77,21 @@ LIMIT 5;
 HUMAN RESOURCES QUESTION
 Each month, the 2 sellers with the highest turnover.
 */
-SELECT
+WITH t1 AS (SELECT
 	YEAR(payments.paymentDate) as year,
     MONTH(payments.paymentDate) as month,
     customers.salesRepEmployeeNumber as seller_id,
     firstName as seller_first_name,
     lastName as seller_last_name,
-    SUM(payments.amount) as amount
+    SUM(payments.amount) as amount,
+    ROW_NUMBER() OVER(PARTITION BY year, month ORDER BY amount DESC) AS rank
 FROM payments
 LEFT JOIN customers
 ON payments.customerNumber = customers.customerNumber
 LEFT JOIN employees
 ON employeeNumber = salesRepEmployeeNumber
 GROUP BY employeeNumber, MONTH(paymentDate), YEAR(paymentDate)
-ORDER BY year, month, amount DESC;
+ORDER BY year, month, amount DESC)
+SELECT * FROM t1
+WHERE rank < 3
+ORDER BY year, month, rank;
