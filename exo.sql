@@ -21,18 +21,29 @@ ORDER BY YEAR(o.orderDate), MONTH(o.orderDate), SUM(ot.quantityOrdered);
 FINANCES QUESTION
 The turnover of the orders of the last two months by country
 */
+
+# Get the order and their total
+WITH sub_order AS (
+SELECT
+	o.customerNumber,
+	o.orderNumber,
+	SUM(DISTINCT od.quantityOrdered * od.priceEach) as amount_order
+FROM orders AS o
+LEFT JOIN orderdetails as od ON od.orderNumber = o.orderNumber
+GROUP BY o.orderNumber
+)
+
 SELECT
 	MONTH(shippedDate),
     customers.country,
-    COUNT(orders.orderNumber),
-    orderdetails.priceEach,
-    COUNT(orders.orderNumber) * orderdetails.priceEach AS 'turnover'
+    COUNT(orders.orderNumber) as nb_orders,
+    SUM(sub_order.amount_order) AS 'turnover'
 FROM orders
 # Find where the country > JOIN in customer table
 LEFT JOIN customers /* name of the table to connect */
 ON customers.customerNumber = orders.customerNumber /* compare values to select */
-LEFT JOIN orderdetails /* name of the table to connect */
-ON orderdetails.orderNumber = orders.orderNumber /* compare values to select */
+LEFT JOIN sub_order /* name of the table to connect */
+ON sub_order.orderNumber = orders.orderNumber /* compare values to select */
 # Find the dates > month > MONTH(shippedDate)
 WHERE YEAR(shippedDate) = 2022
 GROUP BY customers.country, MONTH(shippedDate)
@@ -80,6 +91,7 @@ SELECT o.orderNumber FROM sub_order as o
 JOIN payments as p ON p.customerNumber = o.customerNumber
 WHERE p.amount = o.amount_order)
 AND NOT status = "cancelled";
+
 
 /*
 LOGISTIC QUESTION
