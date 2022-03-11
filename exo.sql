@@ -88,8 +88,8 @@ WITH t1 AS (SELECT
     lastName as seller_last_name,
     # Get the amount earns by seller
     SUM(payments.amount) as amount,
-    # Set a rank to be able to select the best seller
-    ROW_NUMBER() OVER(PARTITION BY year, month ORDER BY amount DESC) AS rank
+    # Set a position to be able to select the best seller
+    ROW_NUMBER() OVER(PARTITION BY year, month ORDER BY amount DESC) AS position
 FROM payments
 # Get the seller from the payment through the customer
 LEFT JOIN customers
@@ -100,5 +100,5 @@ GROUP BY employeeNumber, MONTH(paymentDate), YEAR(paymentDate)
 ORDER BY year, month, amount DESC)
 # Doing a second select to choose the 2 first sellers by year then month
 SELECT * FROM t1
-WHERE rank < 3
-ORDER BY year, month, rank;
+WHERE position < 3
+ORDER BY year, month, position;
