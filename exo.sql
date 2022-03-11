@@ -22,33 +22,18 @@ FINANCES QUESTION
 The turnover of the orders of the last two months by country
 */
 
-# Get the order and their total
-WITH sub_order AS (
 SELECT
-	o.customerNumber,
-	o.orderNumber,
-	SUM(DISTINCT od.quantityOrdered * od.priceEach) as amount_order
+    c.country,
+    SUM(od.quantityOrdered * od.priceEach) as turnover
 FROM orders AS o
-LEFT JOIN orderdetails as od ON od.orderNumber = o.orderNumber
-GROUP BY o.orderNumber
-)
-
-SELECT
-	MONTH(shippedDate),
-    customers.country,
-    COUNT(orders.orderNumber) as nb_orders,
-    SUM(sub_order.amount_order) AS 'turnover'
-FROM orders
 # Find where the country > JOIN in customer table
-LEFT JOIN customers /* name of the table to connect */
-ON customers.customerNumber = orders.customerNumber /* compare values to select */
-LEFT JOIN sub_order /* name of the table to connect */
-ON sub_order.orderNumber = orders.orderNumber /* compare values to select */
+LEFT JOIN customers as c /* name of the table to connect */
+ON c.customerNumber = o.customerNumber /* compare values to select */
+LEFT JOIN orderdetails as od /* name of the table to connect */
+ON od.orderNumber = o.orderNumber /* compare values to select */
 # Find the dates > month > MONTH(shippedDate)
-WHERE YEAR(shippedDate) = 2022
-GROUP BY customers.country, MONTH(shippedDate)
-# 2 last months
-ORDER BY MONTH(shippedDate) DESC;
+WHERE MONTH(o.shippedDate) >= MONTH(NOW() - INTERVAL 2 MONTH) AND YEAR(o.shippedDate) = YEAR(NOW())
+GROUP BY c.country;
 
 /*
 FINANCES QUESTION
