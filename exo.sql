@@ -55,7 +55,9 @@ SELECT * FROM orders
 WHERE NOT orderNumber IN (
 SELECT o.orderNumber FROM sub_order as o
 JOIN payments as p ON p.customerNumber = o.customerNumber
+-- Remove orders fully paid
 WHERE p.amount = o.amount_order)
+-- Remove also orders that willn't be paid
 AND NOT status = "cancelled";
 
 
