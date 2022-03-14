@@ -28,9 +28,9 @@ SELECT
     SUM(od.quantityOrdered * od.priceEach) as turnover
 FROM orders AS o
 # Find where the country > JOIN in customer table
-LEFT JOIN customers as c /* name of the table to connect */
+JOIN customers as c /* name of the table to connect */
 ON c.customerNumber = o.customerNumber /* compare values to select */
-LEFT JOIN orderdetails as od /* name of the table to connect */
+JOIN orderdetails as od /* name of the table to connect */
 ON od.orderNumber = o.orderNumber /* compare values to select */
 # Find the dates > month > MONTH(shippedDate)
 WHERE MONTH(o.shippedDate) >= MONTH(NOW() - INTERVAL 2 MONTH) AND YEAR(o.shippedDate) = YEAR(NOW())
