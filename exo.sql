@@ -40,27 +40,7 @@ GROUP BY c.country;
 FINANCES QUESTION
 Orders that have not yet been paid.
 */
-SELECT
-    o.customerNumber,
-    # Check and compare the numbers between the orders and the payment
-    count(DISTINCT o.orderNumber) as nb_orders,
-    count(DISTINCT p.checkNumber) as nb_payments,
-    count(DISTINCT o.orderNumber) - count(DISTINCT p.checkNumber) as diff,
-    SUM(DISTINCT od.quantityOrdered * od.priceEach) as amount_order,
-    SUM(DISTINCT p.amount) as amount
-FROM orders as o
-# Get the payments data throught customersNumber
-LEFT JOIN payments as p ON p.customerNumber = o.customerNumber
-LEFT JOIN orderdetails as od ON od.orderNumber = o.orderNumber
-# Select only ordersx were not canceled
-WHERE NOT o.status = "Cancelled"
-# Group BY customersNumber
-GROUP BY o.customerNumber
-# Select Customers with more orders then payments
-HAVING diff > 0
-ORDER BY diff DESC;
 
-# Get the order and their total
 WITH sub_order AS (
 SELECT
 	o.customerNumber,
